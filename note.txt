@@ -1,0 +1,14 @@
+1. Phân tích đơn biến:
+- Histogram, Boxplot
+- Bar plot
+2. Phân tích 2 biến:
+- Violin Plot
+3. Phân tích đa biến:
+- Select Top 7 Features with RFE
+- Plot Parallel Coordinates
+- Radar Plot
+- Scatter Plot
+4.  CORRELATION MATRIX
+5. loại bỏ các outliers
+6. Normalize data
+
