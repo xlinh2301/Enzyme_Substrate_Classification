@@ -19,9 +19,9 @@ You can obtain the dataset from Kaggle: [Playground Series S3E18 - Enzyme Substr
 
 3. **Data Preprocessing**:
    - Remove outliers from the dataset using the interquartile range (IQR).
-   - Apply **SMOTE (Synthetic Minority Over-sampling Technique)** to balance the dataset.
    - Normalize data for improved model performance.
-
+   - Apply **SMOTE (Synthetic Minority Over-sampling Technique)** to balance the dataset.
+   
 ## Installation
 
 1. Clone the repository:
