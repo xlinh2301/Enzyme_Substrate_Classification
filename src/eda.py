@@ -212,7 +212,7 @@ def eda(df):
 
             # Kiểm tra session state để lấy dữ liệu đã normalize
             if "union_cols_df_normalized" not in st.session_state:
-                st.warning("Hãy thực hiện bước 'Normalize Data' trước khi tiếp tục.")
+                st.warning("Hãy thực hiện bước 'Scale Data' trước khi tiếp tục.")
             else:
                 normalized_df = st.session_state.union_cols_df_normalized
                 print(f"normalized_df: {normalized_df}")
