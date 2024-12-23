@@ -35,7 +35,37 @@ You can obtain the dataset from Kaggle: [Playground Series S3E18 - Enzyme Substr
   ```bash
   pip install requirements.txt
   ```
-
+## Folder structure
+```bash
+FINAL_PROJECT/
+   │
+   ├── data/                   # Contains datasets
+   │   ├── train.csv           # Original dataset
+   │
+   ├── notebooks/              # Jupyter notebooks for analysis
+   │   ├── eda.ipynb           # EDA and visualization
+   │
+   ├── models/                 # Pre-trained models
+   │   ├── xgboost_model_ec1.pkl
+   │   ├── xgboost_model_ec2.pkl
+   │   ├── xgboost_SMOTE_EC1_model.pkl
+   │   ├── xgboost_SMOTE_EC2_model.pkl
+   │
+   ├── results/                # Results and visualizations
+   │   ├── violin_plots_EC1.png
+   │   ├── violin_plots_EC2.png
+   │
+   ├── src/                    # Source code
+   │   ├── app.py              # Main entry point for the Streamlit app
+   │   ├── preprocessing.py    # Functions for data preprocessing
+   │   ├── predict_and_display.py  # Functions for prediction and SHAP analysis
+   │   ├── utils.py            # Helper functions
+   │
+   ├── .gitignore              # To exclude unnecessary files from version control
+   ├── README.md               # Project documentation
+   ├── requirements.txt        # List of required Python libraries
+   └── LICENSE                 # License file (optional)
+```
 ## Files
   - ``app.py``: Main entry point for the Streamlit app.
   - ``eda.py``: Contains functions for exploratory data analysis (EDA).
