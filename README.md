@@ -41,8 +41,8 @@ You can obtain the dataset from Kaggle: [Playground Series S3E18 - Enzyme Substr
   - ``eda.py``: Contains functions for exploratory data analysis (EDA).
   - ``predict_and_display.py``: Includes the prediction functions and SHAP analysis.
   - ``train.csv``: Dataset containing the features and target variables (EC1, EC2).
-  - ``xgboost_model_ec1.pkl``: Pre-trained XGBoost model for EC1 prediction.
-  - ``xgboost_model_ec2.pkl``: Pre-trained XGBoost model for EC2 prediction.
+  - ``xgboost_SMOTE_EC1_model``: Pre-trained XGBoost model for EC1 prediction.
+  - ``xgboost_SMOTE_EC1_model``: Pre-trained XGBoost model for EC2 prediction.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
