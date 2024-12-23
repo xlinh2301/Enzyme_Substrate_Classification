@@ -115,7 +115,7 @@ def eda(df):
         st.pyplot(f)
     with tabs[3]:
         # --- Tabs Layout ---
-        tabs = st.tabs(["Chọn Feature", "Loại Bỏ Outliers", "Normalize Data", "SMOTE"])
+        tabs = st.tabs(["Chọn Feature", "Loại Bỏ Outliers", "Scale Data", "SMOTE"])
         corr = df.corr()
 
         union_cols_df = df.copy()
