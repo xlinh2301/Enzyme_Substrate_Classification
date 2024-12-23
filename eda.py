@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 import os
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE
 import json
@@ -50,188 +50,220 @@ def eda(df):
                 fig, ax = plt.subplots()
                 sns.boxplot(y=df[selected_feature], ax=ax)
                 st.pyplot(fig)
-
-            # # Bar Plot (cho dữ liệu phân loại)
-            # st.subheader("Bar Plot")
-            # if df[selected_feature].dtype == 'object':
-            #     fig, ax = plt.subplots()
-            #     sns.countplot(x=df[selected_feature], ax=ax)
-            #     st.pyplot(fig)
-            # else:
-            #     st.write("Không thể tạo Bar Plot cho dữ liệu số.")
+                
     with tabs[1]:
         st.header("📈 Phân Tích Hai Biến")
+        subtabs = st.tabs(["Correlation with EC1",  "Correlation with EC2"])
+        # # Chọn biến mục tiêu (ví dụ: EC1)
+        # target = st.selectbox("Chọn biến mục tiêu", ["EC1", "EC2"])
         
-        # Chọn biến mục tiêu (ví dụ: EC1)
-        target = st.selectbox("Chọn biến mục tiêu", ["EC1", "EC2"])
-        
-        # Đường dẫn lưu trữ ảnh
-        image_path = f"violin_plots_{target}.png"
+        # # Đường dẫn lưu trữ ảnh
+        # image_path = f"violin_plots_{target}.png"
 
-        st.subheader(f"Violin Plot cho từng đặc trưng với {target}")
-        st.image(image_path, caption="Violin Plots", use_container_width=True)
+        # st.subheader(f"Violin Plot cho từng đặc trưng với {target}")
+        # st.image(image_path, caption="Violin Plots", use_container_width=True)
         
+         # Tính toán ma trận tương quan
+        corr = df.corr()
+
+        # Lấy tương quan mà không bao gồm 'EC1' và 'EC2'
+        ec1_corr = corr['EC1'].drop(['EC1', 'EC2'])
+        ec2_corr = corr['EC2'].drop(['EC1', 'EC2'])
+
+        # Sắp xếp giá trị tương quan giảm dần
+        ec1_corr_sorted = ec1_corr.sort_values(ascending=False)
+        ec2_corr_sorted = ec2_corr.sort_values(ascending=False)
+
+        with subtabs[0]:
+            # Hiển thị heatmap tương quan với EC1
+            st.subheader("Heatmap tương quan với EC1")
+            sns.set_style("white")
+            sns.set_palette("PuBuGn_d")
+            fig1, ax1 = plt.subplots()
+            sns.heatmap(ec1_corr_sorted.to_frame(), cmap="coolwarm", annot=True, fmt='.2f', ax=ax1)
+            ax1.set_title('Correlation with EC1')
+            st.pyplot(fig1)
+
+        with subtabs[1]:
+            # Hiển thị heatmap tương quan với EC2
+            st.subheader("Heatmap tương quan với EC2")
+            fig2, ax2 = plt.subplots()
+            sns.heatmap(ec2_corr_sorted.to_frame(), cmap="coolwarm", annot=True, fmt='.2f', ax=ax2)
+            ax2.set_title('Correlation with EC2')
+            st.pyplot(fig2)
 
     with tabs[2]:
         st.header("🔍 Phân Tích Đa Biến")
-
-        # Separate the features (X) and target variables (y)
-        X_ec1 = df.drop(['EC2'], axis=1)
-        X_ec2 = df.drop(['EC1'], axis=1)
+        st.write('---')
         
-        # Scatter Plot for Two Features
-        tab_ec1, tab_ec2 = st.tabs(["Scatter Plot - EC1", "Scatter Plot - EC2"])
-        with tab_ec1:
-            st.subheader("Scatter Plot - EC1")
-            # Select the two features   for the scatter plot - EC1
-            feature_x_ec1 = st.selectbox("Chọn đặc trưng X - EC1", X_ec1.columns, key="feature_x_ec1")
-            feature_y_ec1 = st.selectbox("Chọn đặc trưng Y - EC1", X_ec1.columns, key="feature_y_ec1")
-
-            with st.spinner("Đang tạo Scatter Plot EC1..."):
-                # Create the scatter plot using Plotly
-                fig_scatter = px.scatter(X_ec1, 
-                                        x=feature_x_ec1, 
-                                        y=feature_y_ec1, 
-                                        color='EC1', 
-                                        title=f'Scatter Plot - {feature_x_ec1} vs {feature_y_ec1} - EC1',
-                                        color_continuous_scale='Viridis')  # Choose a valid predefined colorscale
-
-                # Display the plot in Streamlit
-                st.plotly_chart(fig_scatter)
-            st.write("---")
-        with tab_ec2:
-            st.subheader("Scatter Plot - EC2")
-            # Select the two features for the scatter plot - EC2
-            feature_x_ec2 = st.selectbox("Chọn đặc trưng X - EC2", X_ec2.columns, key="feature_x_ec2")
-            feature_y_ec2 = st.selectbox("Chọn đặc trưng Y - EC2", X_ec2.columns, key="feature_y_ec2")
-
-            with st.spinner("Đang tạo Scatter Plot EC2..."):
-                # Create the scatter plot using Plotly
-                fig_scatter_EC2 = px.scatter(X_ec2, 
-                                            x=feature_x_ec2, 
-                                            y=feature_y_ec2, 
-                                            color='EC2', 
-                                            title=f'Scatter Plot - {feature_x_ec2} vs {feature_y_ec2} - EC2',
-                                            color_continuous_scale='Viridis')  # Choose a valid predefined colorscale
-
-                # Display the plot in Streamlit
-                st.plotly_chart(fig_scatter_EC2)
-    with tabs[3]:
-        # --- Tabs Layout ---
-        tabs = st.tabs(["Loại Bỏ Outliers", "SMOTE", "Normalize Data"])
+        st.subheader("Correlation Matrix")
+        # Calculate the correlation matrix
         corr = df.corr()
 
-        # Get correlations without 'EC1' and 'EC2'
-        ec1_corr = corr['EC1'].drop(['EC1', 'EC2'])
-        ec1_corr_sorted = ec1_corr.sort_values(ascending=False)
-        # Filter out features with correlation equal to 0.0
-        features_to_keep1 = ec1_corr[abs(ec1_corr) >= 0.01].index
+        # Generate a mask for the upper triangle
+        mask = np.triu(np.ones_like(corr, dtype=bool))
 
-        # Get correlations without 'EC1' and 'EC2'
-        ec2_corr = corr['EC2'].drop(['EC1', 'EC2'])
-        ec2_corr_sorted = ec2_corr.sort_values(ascending=False)
-        # Filter out features with correlation equal to 0.0
-        features_to_keep2 = ec2_corr[abs(ec2_corr) >= 0.01].index
+        # Set up the matplotlib figure
+        f, ax = plt.subplots(figsize=(11, 9))
 
-        union_cols = list(set(features_to_keep1) | set(features_to_keep2))
+        # Generate a custom diverging colormap
+        cmap = sns.diverging_palette(230, 20, as_cmap=True)
 
-        # Print the result
-        print(union_cols)
-        union_cols_df = pd.DataFrame(df[union_cols])
-        union_cols_df[['EC1', 'EC2']] = df[['EC1', 'EC2']]
+        # Draw the heatmap with the mask and correct aspect ratio
+        sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+        st.pyplot(f)
+    with tabs[3]:
+        # --- Tabs Layout ---
+        tabs = st.tabs(["Chọn Feature", "Loại Bỏ Outliers", "Normalize Data", "SMOTE"])
+        corr = df.corr()
+
+        union_cols_df = df.copy()
+        union_cols_df = union_cols_df.drop(['EC1', 'EC2'], axis=1)
+        labels = df[['EC1', 'EC2']]
+        # --- Tab 0: Chọn Feature ---
+        with tabs[0]:
+            st.subheader("Chọn Feature để xử lý")
+ 
+            selected_feature = st.selectbox("Chọn đặc trưng để xử lý", union_cols_df.columns, key="selected_feature")
+            
+            st.write(f"Feature được chọn: **{selected_feature}**")
 
         # --- Tab 1: Loại Bỏ Outliers ---
-        with tabs[0]:
-            st.subheader("Loại Bỏ Outliers")
-            selected_feature = st.selectbox("Chọn đặc trưng để xử lý", union_cols_df.columns, key="outlier_feature")
-
-            if st.button("Loại bỏ outliers"):
-                with st.spinner("Đang load... vui lòng chờ."):
-                    q1 = union_cols_df[selected_feature].quantile(0.25)
-                    q3 = union_cols_df[selected_feature].quantile(0.75)
-                    iqr = q3 - q1
-                    lower_bound = q1 - 1.5 * iqr
-                    upper_bound = q3 + 1.5 * iqr
-
-                    # Lọc dữ liệu không chứa outliers
-                    st.session_state.union_cols_df_filtered = union_cols_df[(union_cols_df[selected_feature] >= lower_bound) & (union_cols_df[selected_feature] <= upper_bound)]
-                    st.write(f"Đã loại bỏ outliers, số dòng còn lại: {len(st.session_state.union_cols_df_filtered)}")
-
-                    # Biểu đồ trước và sau khi loại bỏ outliers
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.write("**Trước khi loại bỏ outliers**")
-                        fig_before = px.box(union_cols_df, y=selected_feature)
-                        st.plotly_chart(fig_before)
-                    with col2:
-                        st.write("**Sau khi loại bỏ outliers**")
-                        fig_after = px.box(st.session_state.union_cols_df_filtered, y=selected_feature)
-                        st.plotly_chart(fig_after)
-
-        # --- Tab 2: SMOTE ---
         with tabs[1]:
-            st.subheader("Cân Bằng Dữ Liệu với SMOTE")
-            target_col = st.selectbox("Chọn cột target", ['EC1', 'EC2'], key="target_column")
+            st.subheader("Thay Thế Outliers")
 
-            if st.button("Áp dụng SMOTE"):
-                with st.spinner("Đang cân bằng dữ liệu... vui lòng chờ."):
-                    union_cols_df_smote_input = st.session_state.get("union_cols_df_filtered", union_cols_df).dropna()
-                    
-                    if target_col == 'EC1':
-                        X = union_cols_df_smote_input.drop(columns=['EC2', 'EC1'])
-                        y = union_cols_df_smote_input['EC1']
-                    else:
-                        X = union_cols_df_smote_input.drop(columns=['EC1', 'EC2'])
-                        y = union_cols_df_smote_input['EC2']
+            # Kiểm tra session state để lấy feature đã chọn
+            if "selected_feature" not in st.session_state:
+                st.warning("Hãy chọn một feature ở tab 'Chọn Feature' trước khi tiếp tục.")
+            else:
+                selected_feature = st.session_state.selected_feature
+                union_cols_df_to_use = st.session_state.get("union_cols_df_filtered", union_cols_df)
+            
+                if st.button("Thay thế outliers"):
+                    with st.spinner("Đang xử lý... vui lòng chờ."):
+                        # Tính toán các giá trị Q1, Q3 và IQR
+                        q1 = union_cols_df_to_use[selected_feature].quantile(0.25)
+                        q3 = union_cols_df_to_use[selected_feature].quantile(0.75)
+                        iqr = q3 - q1
+                        lower_bound = q1 - 1.5 * iqr
+                        upper_bound = q3 + 1.5 * iqr
+                        outliers_count = 0
+                        column_outliers = ((union_cols_df_to_use[selected_feature] < lower_bound) | (union_cols_df_to_use[selected_feature] > upper_bound)).sum()
+                        outliers_count += column_outliers  # Cộng vào tổng số outlier
 
-                    # Áp dụng SMOTE
-                    smote = SMOTE(random_state=42)
-                    X_resampled, y_resampled = smote.fit_resample(X, y)
-                    
-                    # Tạo DataFrame mới sau khi SMOTE
-                    union_cols_df_resampled = pd.DataFrame(X_resampled, columns=X.columns)
-                    union_cols_df_resampled[target_col] = y_resampled
-                    st.session_state.union_cols_df_smote = union_cols_df_resampled
+                        # Thay thế outliers bằng giá trị giới hạn
+                        union_cols_df_to_use[selected_feature] = union_cols_df_to_use[selected_feature].apply(
+                            lambda x: lower_bound if x < lower_bound else (upper_bound if x > upper_bound else x)
+                        )
+                        # Lưu lại DataFrame sau khi xử lý
+                        st.session_state.union_cols_df_filtered = union_cols_df_to_use
+                        print(f"union_cols_df_filtered: {union_cols_df_to_use}")
+                        st.write(f"Số lượng outlier đã xử lý: {outliers_count}")
 
-                    st.write(f"Số lượng mẫu trước khi SMOTE: {len(union_cols_df_smote_input)}")
-                    st.write(f"Số lượng mẫu sau khi SMOTE: {len(union_cols_df_resampled)}")
+                        # Biểu đồ
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**Trước khi xử lý outliers**")
+                            fig_before = px.box(df, y=selected_feature)
+                            st.plotly_chart(fig_before, key="fig_before")
+                        with col2:
+                            union_cols_df_to_use = pd.concat([union_cols_df_to_use, labels], axis=1)
+                            st.write("**Sau khi xử lý outliers**")
+                            fig_after = px.box(union_cols_df_to_use, y=selected_feature)
+                            st.plotly_chart(fig_after, key="fig_after")
 
-                    # Hiển thị biểu đồ trước và sau khi SMOTE
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if len(X.columns) >= 2:
-                            fig_before_smote = px.scatter(union_cols_df_smote_input, x=X.columns[0], y=X.columns[1], color=target_col, title="Trước SMOTE")
-                            st.plotly_chart(fig_before_smote)
-                    with col2:
-                        if len(X_resampled.columns) >= 2:
-                            fig_after_smote = px.scatter(union_cols_df_resampled, x=X_resampled.columns[0], y=X_resampled.columns[1], color=target_col, title="Sau SMOTE")
-                            st.plotly_chart(fig_after_smote)
-
-        # --- Tab 3: Normalize Data ---
+        # --- Tab 2: Normalize Data ---
         with tabs[2]:
             st.subheader("Normalize Data")
-            selected_feature_norm = st.selectbox("Chọn đặc trưng để normalize", union_cols_df.columns, key="normalize_feature")
 
-            if st.button("Normalize"):
-                with st.spinner("Đang normalize... vui lòng chờ."):
-                    data_to_normalize = st.session_state.get("union_cols_df_smote", union_cols_df)
-                    
-                    # Normalize dữ liệu
-                    scaler = MinMaxScaler()
-                    union_cols_df_normalized = data_to_normalize.copy()
-                    union_cols_df_normalized[selected_feature_norm] = scaler.fit_transform(data_to_normalize[[selected_feature_norm]])
-                    
-                    st.write("Dữ liệu sau khi normalize:")
-                    st.write(union_cols_df_normalized.head())
-                    
-                    # Biểu đồ trước và sau khi normalize
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.write("**Trước khi normalize**")
-                        fig_before_norm = px.histogram(data_to_normalize, x=selected_feature_norm)
-                        st.plotly_chart(fig_before_norm)
-                    with col2:
-                        st.write("**Sau khi normalize**")
-                        fig_after_norm = px.histogram(union_cols_df_normalized, x=selected_feature_norm)
-                        st.plotly_chart(fig_after_norm)
+            # Kiểm tra session state để lấy dữ liệu đã loại bỏ outliers
+            if "union_cols_df_filtered" not in st.session_state:
+                st.warning("Hãy thực hiện bước 'Loại Bỏ Outliers' trước khi tiếp tục.")
+            else:
+                filtered_df = st.session_state.union_cols_df_filtered
 
+                if st.button("Normalize"):
+                    with st.spinner("Đang normalize... vui lòng chờ."):
+                        def apply_log_transform_positive(X):
+                            X_transformed = X.copy()
+                            X_transformed = X_transformed.applymap(lambda x: np.log1p(x) if x > 0 else 0)
+                            return pd.DataFrame(X_transformed, columns=X.columns)
+                        normalized_df = apply_log_transform_positive(filtered_df)
+                        st.session_state.union_cols_df_normalized = normalized_df  # Lưu lại dữ liệu đã normalize
+
+                        st.write("Dữ liệu sau khi normalize:")
+                        st.write(normalized_df.head())
+
+                        # Biểu đồ
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**Trước khi normalize**")
+                            fig_before_norm = px.histogram(filtered_df, x=selected_feature)
+                            st.plotly_chart(fig_before_norm, key="before_norm")
+                        with col2:
+                            st.write("**Sau khi normalize**")
+                            fig_after_norm = px.histogram(normalized_df, x=selected_feature)
+                            st.plotly_chart(fig_after_norm, key="after_norm")
+
+        # --- Tab 3: SMOTE ---
+        with tabs[3]:
+            st.subheader("Cân Bằng Dữ Liệu với SMOTE")
+
+            # Kiểm tra session state để lấy dữ liệu đã normalize
+            if "union_cols_df_normalized" not in st.session_state:
+                st.warning("Hãy thực hiện bước 'Normalize Data' trước khi tiếp tục.")
+            else:
+                normalized_df = st.session_state.union_cols_df_normalized
+                print(f"normalized_df: {normalized_df}")
+                target_col = st.selectbox("Chọn cột target", ['EC1', 'EC2'], key="target_column")
+
+                if st.button("Áp dụng SMOTE"):
+                    with st.spinner("Đang cân bằng dữ liệu... vui lòng chờ."):
+                        X = normalized_df[[selected_feature]].dropna()
+                        y = labels[target_col]
+                        # print(f"X: {X}")
+                        # print(f"y: {y}")
+
+                        # Áp dụng SMOTE
+                        smote = SMOTE(random_state=42)
+                        X_resampled, y_resampled = smote.fit_resample(X, y)
+
+                        # Tạo DataFrame mới sau khi SMOTE
+                        smote_df = pd.DataFrame(X_resampled, columns=[selected_feature])
+                        smote_df[target_col] = y_resampled
+                        st.session_state.union_cols_df_smote = smote_df  # Lưu lại dữ liệu đã cân bằng
+
+                        st.write(f"Số lượng mẫu trước khi SMOTE: {len(X)}")
+                        st.write(f"Số lượng mẫu sau khi SMOTE: {len(smote_df)}")
+
+                        df_before_smote = pd.concat([normalized_df[[selected_feature]], labels], axis=1)
+                        df_after_smote = pd.concat([smote_df[[selected_feature]], smote_df[target_col]], axis=1)
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            # Biểu đồ trước SMOTE
+                            st.write("**Trước khi SMOTE:**")
+                            fig_before_smote = px.histogram(df_before_smote, x=selected_feature, color=target_col, title="Trước SMOTE")
+                            st.plotly_chart(fig_before_smote)
+
+                        with col2:
+                            # Biểu đồ sau SMOTE
+                            st.write("**Sau khi SMOTE:**")
+                            
+                            fig_after_smote = px.histogram(df_after_smote, x=selected_feature, color=target_col, title="Sau SMOTE")
+                            st.plotly_chart(fig_after_smote)
+                        col3, col4 = st.columns(2)
+
+                        with col3:
+                            # Biểu đồ countplot trước SMOTE
+                            st.write("**Trước khi SMOTE:**")
+                            plt.figure(figsize=(8, 6))
+                            sns.countplot(x=target_col, data=df_before_smote)
+                            st.pyplot(plt)
+
+                        with col4:
+                            # Biểu đồ countplot sau SMOTE
+                            st.write("**Sau khi SMOTE:**")
+                            plt.figure(figsize=(8, 6))
+                            sns.countplot(x=target_col, data=df_after_smote)
+                            st.pyplot(plt)
