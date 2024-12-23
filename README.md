@@ -42,9 +42,6 @@ FINAL_PROJECT/
    ├── data/                   # Contains datasets
    │   ├── train.csv           # Original dataset
    │
-   ├── notebooks/              # Jupyter notebooks for analysis
-   │   ├── eda.ipynb           # EDA and visualization
-   │
    ├── models/                 # Pre-trained models
    │   ├── xgboost_model_ec1.pkl
    │   ├── xgboost_model_ec2.pkl
