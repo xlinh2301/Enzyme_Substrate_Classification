@@ -173,9 +173,9 @@ def eda(df):
                             fig_after = px.box(union_cols_df_to_use, y=selected_feature)
                             st.plotly_chart(fig_after, key="fig_after")
 
-        # --- Tab 2: Normalize Data ---
+        # --- Tab 2: Scale Data ---
         with tabs[2]:
-            st.subheader("Normalize Data")
+            st.subheader("Scale Data")
 
             # Kiểm tra session state để lấy dữ liệu đã loại bỏ outliers
             if "union_cols_df_filtered" not in st.session_state:
@@ -183,8 +183,8 @@ def eda(df):
             else:
                 filtered_df = st.session_state.union_cols_df_filtered
 
-                if st.button("Normalize"):
-                    with st.spinner("Đang normalize... vui lòng chờ."):
+                if st.button("Scale"):
+                    with st.spinner("Đang scale... vui lòng chờ."):
                         def apply_log_transform_positive(X):
                             X_transformed = X.copy()
                             X_transformed = X_transformed.applymap(lambda x: np.log1p(x) if x > 0 else 0)
@@ -192,17 +192,17 @@ def eda(df):
                         normalized_df = apply_log_transform_positive(filtered_df)
                         st.session_state.union_cols_df_normalized = normalized_df  # Lưu lại dữ liệu đã normalize
 
-                        st.write("Dữ liệu sau khi normalize:")
+                        st.write("Dữ liệu sau khi scale:")
                         st.write(normalized_df.head())
 
                         # Biểu đồ
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.write("**Trước khi normalize**")
+                            st.write("**Trước khi scale**")
                             fig_before_norm = px.histogram(filtered_df, x=selected_feature)
                             st.plotly_chart(fig_before_norm, key="before_norm")
                         with col2:
-                            st.write("**Sau khi normalize**")
+                            st.write("**Sau khi scale**")
                             fig_after_norm = px.histogram(normalized_df, x=selected_feature)
                             st.plotly_chart(fig_after_norm, key="after_norm")
 
