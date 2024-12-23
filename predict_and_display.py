@@ -4,7 +4,6 @@ import pickle
 import shap
 import matplotlib.pyplot as plt
 import plotly.express as px
-from streamlit_plotly_events import plotly_events
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 import random
