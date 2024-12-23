@@ -56,7 +56,6 @@ FINAL_PROJECT/
    │   ├── app.py              # Main entry point for the Streamlit app
    │   ├── preprocessing.py    # Functions for data preprocessing
    │   ├── predict_and_display.py  # Functions for prediction and SHAP analysis
-   │   ├── utils.py            # Helper functions
    │
    ├── .gitignore              # To exclude unnecessary files from version control
    ├── README.md               # Project documentation
