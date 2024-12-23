@@ -42,7 +42,7 @@ FINAL_PROJECT/
    ├── data/                   # Contains datasets
    │   ├── train.csv           # Original dataset
    │
-   ├── models/                 # Pre-trained models
+   ├── checkpoint/                 # Pre-trained models
    │   ├── xgboost_model_ec1.pkl
    │   ├── xgboost_model_ec2.pkl
    │   ├── xgboost_SMOTE_EC1_model.pkl
@@ -56,7 +56,6 @@ FINAL_PROJECT/
    │   ├── app.py              # Main entry point for the Streamlit app
    │   ├── preprocessing.py    # Functions for data preprocessing
    │   ├── predict_and_display.py  # Functions for prediction and SHAP analysis
-   │   ├── utils.py            # Helper functions
    │
    ├── .gitignore              # To exclude unnecessary files from version control
    ├── README.md               # Project documentation
