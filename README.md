@@ -42,7 +42,7 @@ FINAL_PROJECT/
    ├── data/                   # Contains datasets
    │   ├── train.csv           # Original dataset
    │
-   ├── models/                 # Pre-trained models
+   ├── checkpoint/                 # Pre-trained models
    │   ├── xgboost_model_ec1.pkl
    │   ├── xgboost_model_ec2.pkl
    │   ├── xgboost_SMOTE_EC1_model.pkl
