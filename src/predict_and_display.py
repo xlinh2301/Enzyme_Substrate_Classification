@@ -107,7 +107,7 @@ def display_shap_plot(model, x_test_no_target, feature_names):
     """Hiển thị biểu đồ SHAP."""
     with st.spinner("Đang tạo biểu đồ SHAP..."):
         explainer = shap.Explainer(model, x_test_no_target, feature_names=feature_names)
-        shap_values = explainer(st.session_state.sample)
+        shap_values = explainer(st.session_state.sample, check_additivity=False)
 
         st.write("### Biểu đồ SHAP: Đóng góp của từng đặc trưng vào dự đoán")
         shap.plots.waterfall(shap_values[0])

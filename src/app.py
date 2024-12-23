@@ -10,16 +10,16 @@ from predict_and_display import predict_and_display_with_shap
 from eda import eda
 from preprocessing import preprocessing
 # Load models đã lưu
-with open("xgboost_SMOTE_EC1_model.pkl", "rb") as file:
+with open("./checkpoint/xgboost_SMOTE_EC1_model.pkl", "rb") as file:
     model_ec1 = pickle.load(file)
 
-with open("xgboost_SMOTE_EC2_model.pkl", "rb") as file:
+with open("./checkpoint/xgboost_SMOTE_EC2_model.pkl", "rb") as file:
     model_ec2 = pickle.load(file)
 
 # Load dataset
 @st.cache_data
 def load_data():
-    dataset = pd.read_csv('./train.csv')
+    dataset = pd.read_csv('./data/train.csv')
     train = dataset.drop(['id', 'EC3', 'EC4', 'EC5', 'EC6'], axis=1)
     df_new = train.copy()
     y_ec1 = dataset['EC1']
